@@ -22,6 +22,7 @@ namespace Todo.API
         {
             var connectionString = Configuration.GetConnectionString(Constants.ConnectionStringKey);
             services.RegisterDataDependencies(connectionString);
+            services.RegisterLogicDependencies();
 
             services.AddControllers();
         }

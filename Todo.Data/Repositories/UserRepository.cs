@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Todo.Core.Abstractions;
+using Todo.Core.Abstractions.Data;
 using Todo.Core.Models.Sql;
 
 namespace Todo.Data.Repositories

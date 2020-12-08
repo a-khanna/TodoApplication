@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Todo.Core.Models.Sql;
 
-namespace Todo.Core.Abstractions
+namespace Todo.Core.Abstractions.Data
 {
     /// <summary>
     /// Repository for handling User entities

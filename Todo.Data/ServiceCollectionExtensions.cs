@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Todo.Core.Abstractions;
+using Todo.Core.Abstractions.Data;
 using Todo.Data.Repositories;
 
 namespace Todo.Data

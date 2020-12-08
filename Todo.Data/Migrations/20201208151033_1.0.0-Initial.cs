@@ -137,6 +137,12 @@ namespace Todo.Data.Migrations
                 name: "IX_TodoLists_UserId",
                 table: "TodoLists",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Username",
+                table: "Users",
+                column: "Username",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

@@ -10,7 +10,7 @@ using Todo.Data;
 namespace Todo.Data.Migrations
 {
     [DbContext(typeof(TodoDbContext))]
-    [Migration("20201208140309_1.0.0-Initial")]
+    [Migration("20201208151033_1.0.0-Initial")]
     partial class _100Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,6 +140,9 @@ namespace Todo.Data.Migrations
                         .HasMaxLength(100);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });

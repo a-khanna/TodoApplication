@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,7 +20,9 @@ namespace Todo.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<TodoDbContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString(Constants.ConnectionStringKey)));
+            var connectionString = Configuration.GetConnectionString(Constants.ConnectionStringKey);
+            services.RegisterDataDependencies(connectionString);
+
             services.AddControllers();
         }
 

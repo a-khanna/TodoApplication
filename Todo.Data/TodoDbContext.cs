@@ -29,6 +29,9 @@ namespace Todo.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // should not allow duplicate usernames in the database
+            modelBuilder.Entity<User>().HasIndex(x => new { x.Username }).IsUnique();
+
             // all todo items should be deleted when the parent list is deleted
             modelBuilder.Entity<TodoItem>()
                 .HasOne<TodoList>()

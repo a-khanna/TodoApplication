@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Todo.Core;
+using Todo.Data;
 
 namespace Todo.API
 {
@@ -25,11 +21,12 @@ namespace Todo.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<TodoDbContext>(opts => opts.UseSqlServer(Configuration.GetConnectionString(Constants.ConnectionStringKey)));
             services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TodoDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -46,6 +43,10 @@ namespace Todo.API
             {
                 endpoints.MapControllers();
             });
+
+            // Seed database only if seeding is enabled in appsettings (default = true)
+            if (Configuration.GetValue<bool>(Constants.SeedKey))
+                dbContext.Seed();
         }
     }
 }

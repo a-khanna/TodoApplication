@@ -16,4 +16,8 @@ Set the below flag in case seeding is needed. This will also ensure database cre
 Database migrations are also available.
 It is recommended to first run the migration and then use seeding.
 
-### Running the application
+### Logging
+Uses NLog as the logging provider.
+Logs are stored in logs.txt in the executing directory.
+Logs Correlation-Id in all the logs within the request pipeline.
+Logs all request and response details (including message body).

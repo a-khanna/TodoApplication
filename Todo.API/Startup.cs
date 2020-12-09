@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using Todo.API.Middlewares;
 using Todo.Core;
 using Todo.Core.Logging;
 using Todo.Data;
@@ -31,6 +32,8 @@ namespace Todo.API
             services.RegisterDataDependencies(connectionString);
             services.RegisterLogicDependencies();
             services.AddHttpContextAccessor();
+
+            services.RegisterMiddlewares();
 
             services.AddApiVersioning(x =>
             {
@@ -60,6 +63,9 @@ namespace Todo.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Todo V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            app.UseCorrelationId();
+            app.UseRequestLogging();
 
             app.UseRouting();
 

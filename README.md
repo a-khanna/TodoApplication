@@ -21,3 +21,4 @@ Uses NLog as the logging provider.
 Logs are stored in logs.txt in the executing directory.
 Logs Correlation-Id in all the logs within the request pipeline.
 Logs all request and response details (including message body).
+Format for log messages is: datetime  correlation-id  log-level  class-name  log-message  exception

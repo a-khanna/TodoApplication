@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -35,19 +34,12 @@ namespace Todo.API
 
             services.RegisterMiddlewares();
 
-            services.AddVersionedApiExplorer(o =>
-            {
-                o.GroupNameFormat = "'v'VVV";
-                o.SubstituteApiVersionInUrl = true;
-            });
-            services.AddApiVersioning(x =>
-            {
-                x.DefaultApiVersion = new ApiVersion(1, 0);
-                x.AssumeDefaultVersionWhenUnspecified = true;
-                x.ReportApiVersions = true;
-            });
+            services.AddVersioning();
 
-            services.AddSwaggerGen();
+            var jwtKey = Configuration.GetValue<string>(Constants.AppSettingsJwtKey);
+            var jwtIssuer = Configuration.GetValue<string>(Constants.AppSettingsJwtIssuer);
+            services.AddJwtAuthentication(jwtIssuer, jwtKey);
+            services.AddSwaggerGenWithAuth();
 
             services.AddControllers();
         }
@@ -75,6 +67,7 @@ namespace Todo.API
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

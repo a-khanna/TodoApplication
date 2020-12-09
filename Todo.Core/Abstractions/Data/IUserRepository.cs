@@ -9,10 +9,11 @@ namespace Todo.Core.Abstractions.Data
     public interface IUserRepository
     {
         /// <summary>
-        /// Gets user entity by username
+        /// Gets user entity by username.
+        /// Returns user entity. Returns null if no user is found.
         /// </summary>
         /// <param name="username">User name</param>
-        /// <returns></returns>
+        /// <returns>User entity</returns>
         User GetUserByUsername(string username);
 
         /// <summary>

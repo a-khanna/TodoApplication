@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Todo.Core.Models.Response;
@@ -15,10 +17,12 @@ namespace Todo.API.Middlewares
     public class ExceptionHandlingMiddleware : IMiddleware
     {
         private readonly ILogger<ExceptionHandlingMiddleware> logger;
+        private readonly IWebHostEnvironment env;
 
-        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger)
+        public ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> logger, IWebHostEnvironment env)
         {
             this.logger = logger;
+            this.env = env;
         }
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
@@ -39,8 +43,12 @@ namespace Todo.API.Middlewares
                     {
                         Status = context.Response.StatusCode,
                         Message = ex.Message,
-                        StackTrace = ex.StackTrace
                     };
+
+                    if (env.IsDevelopment())
+                    {
+                        errorModel.StackTrace = ex.StackTrace;
+                    }
 
                     await substituteStream.CopyToAsync(originalResponseStream);
                     context.Response.Body = originalResponseStream;

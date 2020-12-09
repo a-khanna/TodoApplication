@@ -19,10 +19,11 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Gets user entity by username
+        /// Gets user entity by username.
+        /// Returns user entity. Returns null if no user is found.
         /// </summary>
         /// <param name="username">User name</param>
-        /// <returns></returns>
+        /// <returns>User entity</returns>
         public User GetUserByUsername(string username)
         {
             if (string.IsNullOrWhiteSpace(username))

@@ -10,22 +10,17 @@ using Xunit;
 namespace Todo.UnitTests.Data
 {
     public class UserRepositoryTests
-    {        
-        private readonly UserRepository userRepository;
-        private TodoDbContext dbContext;
-
-        public UserRepositoryTests()
-        {
-            SetupDatabase();
-            userRepository = new UserRepository(dbContext);            
-        }        
-
+    {
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData(" ")]
         public void GetUserByUsername_ShouldThrowExceptionForNullOrWhiteSpaceUsername(string username)
         {
+            // Arrange
+            var dbContext = SetupDatabase(nameof(GetUserByUsername_ShouldThrowExceptionForNullOrWhiteSpaceUsername));
+            var userRepository = new UserRepository(dbContext);
+
             // Act
             var exception = Record.Exception(() => userRepository.GetUserByUsername(username));
 
@@ -37,6 +32,10 @@ namespace Todo.UnitTests.Data
         [Fact]
         public void GetUserByUsername_ShouldReturnUserWithTheGivenUsername()
         {
+            // Arrange
+            var dbContext = SetupDatabase(nameof(GetUserByUsername_ShouldReturnUserWithTheGivenUsername));
+            var userRepository = new UserRepository(dbContext);
+
             // Act
             var result = userRepository.GetUserByUsername("testuser");
 
@@ -48,6 +47,10 @@ namespace Todo.UnitTests.Data
         [Fact]
         public void GetUserByUsername_ShouldReturnNullIfUsernameIsNotFound()
         {
+            // Arrange
+            var dbContext = SetupDatabase(nameof(GetUserByUsername_ShouldReturnNullIfUsernameIsNotFound));
+            var userRepository = new UserRepository(dbContext);
+
             // Act
             var result = userRepository.GetUserByUsername("random");
 
@@ -59,6 +62,10 @@ namespace Todo.UnitTests.Data
         public async Task CreateUser_ShouldAddUserToTheDatabase()
         {
             // Arrange
+            var dbContext = SetupDatabase(nameof(CreateUser_ShouldAddUserToTheDatabase));
+            var userRepository = new UserRepository(dbContext);
+
+            // Arrange
             var saltAndHash = CryptographyHelper.GetSaltAndHash("4321");
 
             // Act
@@ -69,12 +76,12 @@ namespace Todo.UnitTests.Data
             Assert.True(result);
         }
 
-        private void SetupDatabase()
+        private TodoDbContext SetupDatabase(string dbname)
         {
             var builder = new DbContextOptionsBuilder<TodoDbContext>()
-                .UseInMemoryDatabase(databaseName: nameof(UserRepositoryTests));
+                .UseInMemoryDatabase(databaseName: dbname);
 
-            dbContext = new TodoDbContext(builder.Options);
+            var dbContext = new TodoDbContext(builder.Options);
 
             var saltAndHash = CryptographyHelper.GetSaltAndHash("1234");
             dbContext.Users.Add(new Todo.Core.Models.Sql.User
@@ -86,6 +93,8 @@ namespace Todo.UnitTests.Data
             });
 
             dbContext.SaveChanges();
+
+            return dbContext;
         }
     }
 }

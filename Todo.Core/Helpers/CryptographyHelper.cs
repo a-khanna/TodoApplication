@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Todo.Core.Helpers
 {
@@ -45,6 +48,29 @@ namespace Todo.Core.Helpers
                 }
             }
             return true;
+        }
+
+        /// <summary>
+        /// Generates a JWT with userid and username in the claims
+        /// </summary>
+        /// <param name="jwtKey">Key used for encryption</param>
+        /// <param name="jwtIssuer">Issuer of the JWT</param>
+        /// <param name="userId">User id to be included in claims</param>
+        /// <param name="username">Username to be included in claims</param>
+        /// <returns>JWT string</returns>
+        public static string GenerateJSONWebToken(string jwtKey, string jwtIssuer, string userId, string username)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[] {
+                new Claim(Constants.UserIdClaim, userId),
+                new Claim(Constants.UsernameClaim, username),
+                new Claim(Constants.IssuerClaim, jwtIssuer)
+            };
+
+            var token = new JwtSecurityToken(jwtIssuer, jwtIssuer, claims, expires: DateTime.Now.AddMinutes(120), signingCredentials: credentials);
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

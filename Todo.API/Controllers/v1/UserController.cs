@@ -31,7 +31,25 @@ namespace Todo.API.Controllers.v1
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpPost]
+        [HttpPost("authenticate")]
+        public IActionResult Authenticate(CredentialsDto credentials)
+        {
+            var result = userLogic.VerifyLogin(credentials);
+
+            if (string.IsNullOrEmpty(result))
+                return BadRequest();
+            else
+                return Ok(result);
+        }
+
+        /// <summary>
+        /// Register a new user
+        /// </summary>
+        /// <param name="user">User dto</param>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(UserDto user)
         {
             var result = await userLogic.RegisterUser(user);

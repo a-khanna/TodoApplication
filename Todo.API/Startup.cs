@@ -64,6 +64,7 @@ namespace Todo.API
                 c.RoutePrefix = string.Empty;
             });
 
+            app.UseExceptionHandling();
             app.UseCorrelationId();
             app.UseRequestLogging();
 

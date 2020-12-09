@@ -46,26 +46,14 @@ namespace Todo.API.Middlewares
 
                 logger.LogInformation($"Request => method {method}, url: {url}, origin: {origin}, referer: {referer}, agent: {userAgent}, ip: {ipAddress}, body: {requestBody}");
 
-                var originalResponseStream = context.Response.Body;
+                await next(context);
 
-                using (var substituteStream = new MemoryStream())
-                {
-                    context.Response.Body = substituteStream;
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
+                var responseBodyReader = new StreamReader(context.Response.Body);
+                var responseBody = await responseBodyReader.ReadToEndAsync();
+                context.Response.Body.Seek(0, SeekOrigin.Begin);
 
-                    await next(context);
-
-                    substituteStream.Seek(0, SeekOrigin.Begin);
-                    var responseBodyReader = new StreamReader(substituteStream);
-                    var responseBody = await responseBodyReader.ReadToEndAsync();
-                    
-                    substituteStream.Seek(0, SeekOrigin.Begin);
-                    await substituteStream.CopyToAsync(originalResponseStream);
-
-                    context.Response.Body = originalResponseStream;
-
-                    logger.LogInformation($"Response => status {context.Response.StatusCode}, body: {responseBody}");
-                }
-                
+                logger.LogInformation($"Response => status {context.Response.StatusCode}, body: {responseBody}");
             }
             else
             {

@@ -15,10 +15,16 @@ namespace Todo.API.Middlewares
             return builder.UseMiddleware<CorrelationIdMiddleware>();
         }
 
+        public static IApplicationBuilder UseExceptionHandling(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<ExceptionHandlingMiddleware>();
+        }
+
         public static void RegisterMiddlewares(this IServiceCollection services)
         {
             services.AddSingleton<CorrelationIdMiddleware>();
             services.AddSingleton<RequestLoggingMiddleware>();
+            services.AddSingleton<ExceptionHandlingMiddleware>();
         }
     }
 

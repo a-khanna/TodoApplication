@@ -41,7 +41,7 @@ namespace Todo.API.Middlewares
                 {
                     var errorModel = new ErrorResponse
                     {
-                        Status = context.Response.StatusCode,
+                        Status = false,
                         Message = ex.Message,
                     };
 

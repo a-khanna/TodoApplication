@@ -1,3 +1,5 @@
+using System;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -40,6 +42,8 @@ namespace Todo.API
             var jwtIssuer = Configuration.GetValue<string>(Constants.AppSettingsJwtIssuer);
             services.AddJwtAuthentication(jwtIssuer, jwtKey);
             services.AddSwaggerGenWithAuth();
+
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddControllers().AddXmlDataContractSerializerFormatters();
         }

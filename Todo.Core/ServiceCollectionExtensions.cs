@@ -15,6 +15,7 @@ namespace Todo.Core
         /// <param name="services">Service Collection object</param>
         public static void RegisterLogicDependencies(this IServiceCollection services)
         {
+            services.AddScoped<ITodoListLogic, TodoListLogic>();
             services.AddScoped<IUserLogic, UserLogic>();
         }
     }

@@ -64,6 +64,7 @@ namespace Todo.API
             app.UseExceptionHandling();
             app.UseCorrelationId();
             app.UseRequestLogging();
+            app.UseContentLocation();
 
             app.UseRouting();
 

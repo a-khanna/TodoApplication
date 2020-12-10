@@ -41,7 +41,7 @@ namespace Todo.API
             services.AddJwtAuthentication(jwtIssuer, jwtKey);
             services.AddSwaggerGenWithAuth();
 
-            services.AddControllers();
+            services.AddControllers().AddXmlDataContractSerializerFormatters();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

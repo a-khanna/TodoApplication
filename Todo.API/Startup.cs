@@ -1,5 +1,7 @@
 using System;
 using AutoMapper;
+using HotChocolate;
+using HotChocolate.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using Todo.API.GraphQL;
 using Todo.API.Middlewares;
 using Todo.Core;
 using Todo.Core.Logging;
@@ -45,6 +48,12 @@ namespace Todo.API
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+            services.AddGraphQL(s => SchemaBuilder.New()
+                    .AddServices(s)
+                    .AddQueryType<Query>()
+                    .AddMutationType<Mutation>()
+                    .Create());
+
             services.AddControllers().AddXmlDataContractSerializerFormatters();
         }
 
@@ -74,6 +83,9 @@ namespace Todo.API
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseGraphQLJWTMiddleware();
+            app.UseGraphQL().UsePlayground();
 
             app.UseEndpoints(endpoints =>
             {

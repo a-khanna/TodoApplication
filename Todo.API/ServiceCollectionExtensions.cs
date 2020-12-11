@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Todo.API.Swagger;
 
 namespace Todo.API
 {
@@ -50,6 +51,7 @@ namespace Todo.API
                     Title = "Todo API",
                     Description = "API for managing Todo lists and items"
                 });
+                c.SchemaFilter<ExampleSchemaFilter>();
                 // To Enable authorization using Swagger (JWT)  
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
                 {

@@ -46,6 +46,7 @@ namespace Todo.API.Controllers.v1
                 return Ok(new Response<string>
                 {
                     Status = true,
+                    Model = result,
                     Message = "Successfully authenticated."
                 });
         }

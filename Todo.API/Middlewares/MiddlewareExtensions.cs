@@ -25,12 +25,18 @@ namespace Todo.API.Middlewares
             return builder.UseMiddleware<ContentLocationMiddleware>();
         }
 
+        public static IApplicationBuilder UseGraphQLJWTMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<GraphQLJWTMiddleware>();
+        }
+
         public static void RegisterMiddlewares(this IServiceCollection services)
         {
             services.AddSingleton<CorrelationIdMiddleware>();
             services.AddSingleton<RequestLoggingMiddleware>();
             services.AddSingleton<ExceptionHandlingMiddleware>();
             services.AddSingleton<ContentLocationMiddleware>();
+            services.AddSingleton<GraphQLJWTMiddleware>();
         }
     }
 

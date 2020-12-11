@@ -27,7 +27,7 @@ namespace Todo.API
         public void ConfigureServices(IServiceCollection services)
         {
             NLog.LogManager.Configuration = new NLogLoggingConfiguration(Configuration.GetSection(Constants.NLogKey));
-            services.AddTransient(typeof(ILogger<>), typeof(NLogLogger<>));
+            services.AddSingleton(typeof(ILogger<>), typeof(NLogLogger<>));
 
             var connectionString = Configuration.GetConnectionString(Constants.ConnectionStringKey);
             services.RegisterDataDependencies(connectionString);

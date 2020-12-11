@@ -19,6 +19,7 @@ namespace Todo.Data
             services.AddDbContext<TodoDbContext>(opts => opts.UseSqlServer(connectionString));
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ITodoListRepository, TodoListRepository>();
+            services.AddScoped<ITodoItemRepository, TodoItemRepository>();
         }
     }
 }

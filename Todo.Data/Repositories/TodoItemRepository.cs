@@ -11,44 +11,44 @@ using Todo.Core.Models.Sql;
 namespace Todo.Data.Repositories
 {
     /// <summary>
-    /// Repository for handling todo lists
+    /// Repository for handling todo items
     /// </summary>
-    public class TodoListRepository : ITodoListRepository
+    public class TodoItemRepository : ITodoItemRepository
     {
         private readonly TodoDbContext dbContext;
 
-        public TodoListRepository(TodoDbContext dbContext)
+        public TodoItemRepository(TodoDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
 
         /// <summary>
-        /// Gets todo lists by user id.
+        /// Gets todo items by user id.
         /// Returns null if no user is found.
         /// </summary>
         /// <param name="userId">User id</param>
         /// <param name="pagingParams">Pagin params</param>
-        /// <returns>Todo list entities</returns>
-        public PagedResult<TodoList> GetLists(int userId, PagingParameters pagingParams)
+        /// <returns>Todo items entities</returns>
+        public PagedResult<TodoItem> GetItems(int userId, PagingParameters pagingParams)
         {
             if (!dbContext.Users.Any(u => u.Id == userId))
                 return null;
 
-            var dbLists = dbContext.TodoLists
+            var dbItems = dbContext.TodoItems
                 .Include(d => d.Labels).AsNoTracking()
                 .Where(t => t.User.Id == userId);
 
             if (!string.IsNullOrWhiteSpace(pagingParams.Search))
-                dbLists = dbLists.Where(d => d.Name.ToLower().Contains(pagingParams.Search.ToLower()));
+                dbItems = dbItems.Where(d => d.Description.ToLower().Contains(pagingParams.Search.ToLower()));
 
-            var count = dbLists.Count();
+            var count = dbItems.Count();
 
-            var result = dbLists
+            var result = dbItems
                 .Skip(pagingParams.Skip)
                 .Take(pagingParams.Take)
                 .ToList();
 
-            return new PagedResult<TodoList>
+            return new PagedResult<TodoItem>
             {
                 PageContent = result,
                 StartIndex = pagingParams.Skip,
@@ -57,40 +57,49 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Gets todo lists by list id.
-        /// Returns null if list is not found.
+        /// Gets todo items by list id.
+        /// Returns null if item is not found.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="listId">List id</param>
-        /// <returns>Todo list entity</returns>
-        public TodoList GetList(int userId, int listId)
+        /// <param name="itemId">item id</param>
+        /// <returns>Todo item entity</returns>
+        public TodoItem GetItem(int userId, int itemId)
         {
-            return dbContext.TodoLists
+            return dbContext.TodoItems
                 .AsNoTracking()
-                .Include(t => t.Items)
                 .Include(t => t.Labels)
-                .FirstOrDefault(t => t.User.Id == userId && t.Id == listId);
+                .FirstOrDefault(t => t.User.Id == userId && t.Id == itemId);
         }
 
         /// <summary>
-        /// Creates a list.
+        /// Creates a item.
         /// Returns null if user is not found.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="createDto">todo List to be created</param>
-        /// <returns>Todo list</returns>
-        public TodoList CreateList(int userId, CreateTodoListDto createDto)
+        /// <param name="createDto">todo item to be created</param>
+        /// <returns>Todo item</returns>
+        public TodoItem CreateItem(int userId, CreateTodoItemDto createDto)
         {
             var user = dbContext.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
                 return null;
 
-            var toBeCreated = new TodoList
+            var list = dbContext.TodoLists
+                .Include(l => l.Items)
+                .FirstOrDefault(u => u.Id == createDto.TodoListId);
+            if (list == null)
+                return null;
+
+            var toBeCreated = new TodoItem
             {
-                Name = createDto.Name,
+                Description = createDto.Description,
                 User = user,
                 LastModified = DateTime.Now
             };
+
+            if (list.Items == null) list.Items = new List<TodoItem>();
+
+            list.Items.Add(toBeCreated);
 
             var result = dbContext.Add(toBeCreated).Entity;
             dbContext.SaveChanges();
@@ -99,18 +108,18 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Updates a todo list.
+        /// Updates a todo item.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="updateObj">todo List to be updated</param>
-        /// <returns>Updated Todo list dto</returns>
-        public TodoList UpdateList(int userId, TodoListDto updateDto)
+        /// <param name="updateObj">todo item to be updated</param>
+        /// <returns>Updated Todo item dto</returns>
+        public TodoItem UpdateItem(int userId, TodoItemDto updateDto)
         {
-            var existing = dbContext.TodoLists.FirstOrDefault(u => u.User.Id == userId && u.Id == updateDto.Id);
+            var existing = dbContext.TodoItems.FirstOrDefault(u => u.User.Id == userId && u.Id == updateDto.Id);
             if (existing == null)
                 return null;
 
-            existing.Name = updateDto.Name;
+            existing.Description = updateDto.Description;
             existing.LastModified = DateTime.Now;
 
             dbContext.SaveChanges();
@@ -119,14 +128,14 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Deletes a todo list.
+        /// Deletes a todo item.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="listId">Id of todo List to be deleted</param>
+        /// <param name="itemId">Id of todo item to be deleted</param>
         /// <returns>True if delete was successful</returns>
-        public bool DeleteList(int userId, int listId)
+        public bool DeleteItem(int userId, int itemId)
         {
-            var existing = dbContext.TodoLists.FirstOrDefault(u => u.User.Id == userId && u.Id == listId);
+            var existing = dbContext.TodoItems.FirstOrDefault(u => u.User.Id == userId && u.Id == itemId);
             if (existing == null)
                 return false;
 
@@ -136,17 +145,17 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Gets labels for todo lists by user id.
-        /// Returns null if no user or list is found.
+        /// Gets labels for todo item by user id.
+        /// Returns null if no user or item is found.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="listId">List Id</param>
+        /// <param name="itemId">Item Id</param>
         /// <returns>List of Labels Dto</returns>
-        public List<Label> GetListLabels(int userId, int listId)
+        public List<Label> GetItemLabels(int userId, int itemId)
         {
-            var existing = dbContext.TodoLists
+            var existing = dbContext.TodoItems
                 .Include(l => l.Labels)
-                .FirstOrDefault(u => u.User.Id == userId && u.Id == listId);
+                .FirstOrDefault(u => u.User.Id == userId && u.Id == itemId);
 
             if (existing == null)
                 return null;
@@ -155,10 +164,10 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Creates a label for todo list.
+        /// Creates a label for todo item.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="createLabelDto">label for todo List to be created</param>
+        /// <param name="createLabelDto">label for todo item to be created</param>
         /// <returns>Label dto</returns>
         public Label CreateLabel(int userId, CreateOrDeleteLabelDto createLabelDto)
         {
@@ -166,14 +175,14 @@ namespace Todo.Data.Repositories
             if (user == null)
                 return null;
 
-            var existingList = dbContext.TodoLists
+            var existingItem = dbContext.TodoItems
                 .Include(l => l.Labels)
                 .FirstOrDefault(u => u.User.Id == userId && u.Id == createLabelDto.ParentId);
-            if (existingList == null)
+            if (existingItem == null)
                 return null;
 
             // if label already exists return that label instead of creating new
-            var existingLabel = existingList.Labels.FirstOrDefault(l => l.Name == createLabelDto.Label);
+            var existingLabel = existingItem.Labels.FirstOrDefault(l => l.Name == createLabelDto.Label);
             if (existingLabel != null)
                 return existingLabel;
 
@@ -184,9 +193,9 @@ namespace Todo.Data.Repositories
                 LastModified = DateTime.Now
             };
 
-            if (existingList.Labels == null) existingList.Labels = new List<Label>();
+            if (existingItem.Labels == null) existingItem.Labels = new List<Label>();
 
-            existingList.Labels.Add(label);
+            existingItem.Labels.Add(label);
 
             dbContext.SaveChanges();
 
@@ -194,20 +203,20 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Updates label for a todo list.
+        /// Updates label for a todo item.
         /// </summary>
         /// <param name="userId">User id</param>
-        /// <param name="updateObj">todo List to be updated</param>
-        /// <returns>Updated Todo list dto</returns>
+        /// <param name="updateObj">label todo item to be updated</param>
+        /// <returns>Updated label</returns>
         public Label UpdateLabel(int userId, UpdateLabelDto updateObj)
         {
-            var existingList = dbContext.TodoLists
+            var existingItem = dbContext.TodoItems
                 .Include(l => l.Labels)
                 .FirstOrDefault(u => u.User.Id == userId && u.Id == updateObj.ParentId);
-            if (existingList == null)
+            if (existingItem == null)
                 return null;
 
-            var existingLabel = existingList.Labels?.FirstOrDefault(l => l.Name == updateObj.CurrentValue);
+            var existingLabel = existingItem.Labels?.FirstOrDefault(l => l.Name == updateObj.CurrentValue);
             if (existingLabel == null)
                 return null;
 
@@ -220,20 +229,20 @@ namespace Todo.Data.Repositories
         }
 
         /// <summary>
-        /// Deletes a label for todo list.
+        /// Deletes a label for todo item.
         /// </summary>
         /// <param name="userId">User id</param>
         /// <param name="deleteDto">Delete Dto</param>
         /// <returns>True if delete was successful</returns>
         public bool DeleteLabel(int userId, CreateOrDeleteLabelDto deleteDto)
         {
-            var existingList = dbContext.TodoLists
+            var existingItem = dbContext.TodoItems
                 .Include(l => l.Labels)
                 .FirstOrDefault(u => u.User.Id == userId && u.Id == deleteDto.ParentId);
-            if (existingList == null)
+            if (existingItem == null)
                 return false;
 
-            var existingLabel = existingList.Labels?.FirstOrDefault(l => l.Name == deleteDto.Label);
+            var existingLabel = existingItem.Labels?.FirstOrDefault(l => l.Name == deleteDto.Label);
             if (existingLabel == null)
                 return false;
 

@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Todo.Core.Abstractions.Logic;
 using Todo.Core.Models.Dtos;
+using Todo.Core.Models.Response;
 
 namespace Todo.API.Controllers.v1
 {
@@ -15,31 +15,39 @@ namespace Todo.API.Controllers.v1
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly ILogger<UserController> logger;
         private readonly IUserLogic userLogic;
 
-        public UserController(ILogger<UserController> logger, IUserLogic userLogic)
+        public UserController(IUserLogic userLogic)
         {
-            this.logger = logger;
             this.userLogic = userLogic;
         }
 
         /// <summary>
-        /// Register a new user
+        /// Verify user credentails. Return a JWT to be used for subsequent requests.
         /// </summary>
-        /// <param name="user">User dto</param>
+        /// <param name="credentials">Username and password</param>
         /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Gets the response model and returns Ok response</response>
+        /// <response code="400">username or password is incorrect</response>
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPost("authenticate")]
         public IActionResult Authenticate(CredentialsDto credentials)
         {
             var result = userLogic.VerifyLogin(credentials);
 
             if (string.IsNullOrEmpty(result))
-                return BadRequest();
+                return BadRequest(new ErrorResponse
+                {
+                    Status = false,
+                    Message = "username or password is incorrect"
+                });
             else
-                return Ok(result);
+                return Ok(new Response<string>
+                {
+                    Status = true,
+                    Message = "Successfully authenticated."
+                });
         }
 
         /// <summary>
@@ -47,17 +55,27 @@ namespace Todo.API.Controllers.v1
         /// </summary>
         /// <param name="user">User dto</param>
         /// <returns></returns>
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <response code="200">Gets the response model and returns Ok response</response>
+        /// <response code="400">There was a problem with registering user</response>
+        [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserDto user)
         {
             var result = await userLogic.RegisterUser(user);
 
             if (result)
-                return Ok();
+                return Ok(new Response<string>
+                {
+                    Status = true,
+                    Message = "Successfully registered user."
+                });           
             else
-                return BadRequest();
+                return BadRequest(new ErrorResponse
+                {
+                    Status = false,
+                    Message = "There was a problem with registering user."
+                });
         }
     }
 }

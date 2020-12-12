@@ -136,7 +136,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPut]
         [HttpPatch]
-        public IActionResult Put(UpdateTodoListDto updateObj)
+        public IActionResult Update(UpdateTodoListDto updateObj)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var updateDto = mapper.Map<TodoListDto>(updateObj);
@@ -270,7 +270,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<LabelDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPut("Label")]
-        public IActionResult PutLabel(UpdateLabelDto updateDto)
+        public IActionResult UpdateLabel(UpdateLabelDto updateDto)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 

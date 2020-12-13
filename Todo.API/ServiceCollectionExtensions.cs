@@ -55,6 +55,9 @@ namespace Todo.API
                 // Examples for requests
                 c.SchemaFilter<ExampleSchemaFilter>();
 
+                // Add custom correlation id to the requests
+                c.OperationFilter<CorrelationIdOperationFilter>();
+
                 // Authorization requirement
                 c.OperationFilter<AuthorizeOperationFilter>();
 

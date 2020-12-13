@@ -75,7 +75,7 @@ namespace Todo.API.Controllers.v1
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "There was a problem with registering user."
+                    Message = "User already exists."
                 });
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Todo.Core.Abstractions.Data;
 using Todo.Core.Models.Sql;
 
@@ -51,6 +52,11 @@ namespace Todo.Data.Repositories
                 FirstName = firstName,
                 LastName = lastName
             };
+
+            var userExists = dbContext.Users.Any(u => u.Username == username);
+
+            if (userExists)
+                return false;
 
             await dbContext.AddAsync(user);
             await dbContext.SaveChangesAsync();

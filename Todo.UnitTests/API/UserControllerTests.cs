@@ -91,7 +91,7 @@ namespace Todo.UnitTests.API
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
             var response = (result as BadRequestObjectResult).Value as ErrorResponse;
-            Assert.Equal("There was a problem with registering user.", response.Message);
+            Assert.Equal("User already exists.", response.Message);
         }
 
         [Fact]

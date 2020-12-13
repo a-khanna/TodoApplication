@@ -59,6 +59,23 @@ namespace Todo.UnitTests.Data
         }
 
         [Fact]
+        public async Task CreateUser_ShouldNotAddDuplicateUserToTheDatabase()
+        {
+            // Arrange
+            var dbContext = SetupDatabase(nameof(CreateUser_ShouldNotAddDuplicateUserToTheDatabase));
+            var userRepository = new UserRepository(dbContext);
+
+            // Arrange
+            var saltAndHash = CryptographyHelper.GetSaltAndHash("4321");
+
+            // Act
+            var result = await userRepository.CreateUser("testuser", saltAndHash.Item1, saltAndHash.Item2, "name2");
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
         public async Task CreateUser_ShouldAddUserToTheDatabase()
         {
             // Arrange

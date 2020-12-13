@@ -1,7 +1,11 @@
 ﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Todo.Core.Models.Dtos;
+using Todo.Core.Models.Request;
+using Todo.Core.Models.Response;
 
 namespace Todo.API.Swagger
 {
@@ -16,10 +20,82 @@ namespace Todo.API.Swagger
         {
             return type.Name switch
             {
-                "CredentialsDto" => new OpenApiObject
+                nameof(ProblemDetails) => new OpenApiObject
                 {
-                    ["UserName"] = new OpenApiString("anirudh"),
-                    ["Password"] = new OpenApiString("asdf"),
+                    [nameof(ProblemDetails.Type)] = new OpenApiString("Type of error"),
+                    [nameof(ProblemDetails.Title)] = new OpenApiString("Error title"),
+                    [nameof(ProblemDetails.Status)] = new OpenApiInteger(401),
+                    [nameof(ProblemDetails.Detail)] = new OpenApiString("Error Detail"),
+                    [nameof(ProblemDetails.Instance)] = new OpenApiString("Instance name"),
+                },
+                nameof(ErrorResponse) => new OpenApiObject
+                {
+                    [nameof(ErrorResponse.Status)] = new OpenApiBoolean(true),
+                    [nameof(ErrorResponse.Message)] = new OpenApiString("Error description."),
+                    [nameof(ErrorResponse.StackTrace)] = new OpenApiString("Error stacktrace in case of development environment"),
+                },
+                nameof(TodoListDto) => new OpenApiObject
+                {
+                    [nameof(TodoListDto.Id)] = new OpenApiInteger(1),
+                    [nameof(TodoListDto.Name)] = new OpenApiString("Shopping list"),
+                },
+                nameof(TodoListDetailedDto) => new OpenApiObject
+                {
+                    [nameof(TodoListDetailedDto.Id)] = new OpenApiInteger(1),
+                    [nameof(TodoListDetailedDto.Name)] = new OpenApiString("Shopping list"),
+                    [nameof(TodoListDetailedDto.Labels)] = new OpenApiArray { new OpenApiString("Urgent"), new OpenApiString("Overdue") },
+                },
+                nameof(UpdateTodoListDto) => new OpenApiObject
+                {
+                    [nameof(UpdateTodoListDto.Id)] = new OpenApiInteger(1),
+                    [nameof(UpdateTodoListDto.Name)] = new OpenApiString("Shopping list"),
+                },
+                nameof(CreateTodoListDto) => new OpenApiObject
+                {
+                    [nameof(CreateTodoListDto.Name)] = new OpenApiString("Christmas gifts")
+                },
+                nameof(TodoItemDto) => new OpenApiObject
+                {
+                    [nameof(TodoItemDto.Id)] = new OpenApiInteger(1),
+                    [nameof(TodoItemDto.Description)] = new OpenApiString("Cheese"),
+                },
+                nameof(UpdateTodoItemDto) => new OpenApiObject
+                {
+                    [nameof(UpdateTodoItemDto.Id)] = new OpenApiInteger(1),
+                    [nameof(UpdateTodoItemDto.Description)] = new OpenApiString("Cheese"),
+                },
+                nameof(CreateTodoItemDto) => new OpenApiObject
+                {
+                    [nameof(CreateTodoItemDto.TodoListId)] = new OpenApiInteger(1),
+                    [nameof(CreateTodoItemDto.Description)] = new OpenApiString("Cheese")
+                },
+                nameof(LabelDto) => new OpenApiObject
+                {
+                    [nameof(LabelDto.Id)] = new OpenApiInteger(1),
+                    [nameof(LabelDto.Name)] = new OpenApiString("Urgent"),
+                },
+                nameof(CreateOrDeleteLabelDto) => new OpenApiObject
+                {
+                    [nameof(CreateOrDeleteLabelDto.ParentId)] = new OpenApiInteger(1),
+                    [nameof(CreateOrDeleteLabelDto.Label)] = new OpenApiString("Urgent"),
+                },
+                nameof(UpdateLabelDto) => new OpenApiObject
+                {
+                    [nameof(UpdateLabelDto.ParentId)] = new OpenApiInteger(1),
+                    [nameof(UpdateLabelDto.CurrentValue)] = new OpenApiString("Today"),
+                    [nameof(UpdateLabelDto.NewValue)] = new OpenApiString("Tomorrow"),
+                },
+                nameof(CredentialsDto) => new OpenApiObject
+                {
+                    [nameof(CredentialsDto.Username)] = new OpenApiString("anirudh"),
+                    [nameof(CredentialsDto.Password)] = new OpenApiString("asdf"),
+                },
+                nameof(UserDto) => new OpenApiObject
+                {
+                    [nameof(UserDto.Username)] = new OpenApiString("peter1"),
+                    [nameof(UserDto.Password)] = new OpenApiString("asdf"),
+                    [nameof(UserDto.FirstName)] = new OpenApiString("Peter"),
+                    [nameof(UserDto.LastName)] = new OpenApiString("Smith")
                 },
                 _ => null,
             };

@@ -63,7 +63,7 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Get a todo list by id
+        /// Get a complete todo list object by id. (Includes its items and labels)
         /// </summary>
         /// <param name="id">Id of the list</param>
         /// <returns>Action result containing todo List or ErrorResponse</returns>

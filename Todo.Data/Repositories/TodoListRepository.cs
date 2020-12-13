@@ -67,7 +67,7 @@ namespace Todo.Data.Repositories
         {
             return dbContext.TodoLists
                 .AsNoTracking()
-                .Include(t => t.Items)
+                .Include(t => t.Items).ThenInclude(t => t.Labels)
                 .Include(t => t.Labels)
                 .FirstOrDefault(t => t.User.Id == userId && t.Id == listId);
         }

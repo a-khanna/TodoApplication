@@ -197,7 +197,7 @@ namespace Todo.UnitTests.Data
             var repository = new TodoListRepository(dbContext);
 
             // Act
-            var result = repository.CreateLabel(3, new CreateOrDeleteLabelDto());
+            var result = repository.CreateLabel(3, new CreateLabelDto());
 
             // Assert
             Assert.Null(result);
@@ -209,7 +209,7 @@ namespace Todo.UnitTests.Data
             // Arrange
             var dbContext = SetupDatabase(nameof(CreateLabel_ShouldReturnNullIfListIsNotFound));
             var repository = new TodoListRepository(dbContext);
-            var input = new CreateOrDeleteLabelDto
+            var input = new CreateLabelDto
             {
                 ParentId = 20,
                 Label = "Cheese"
@@ -228,7 +228,7 @@ namespace Todo.UnitTests.Data
             // Arrange
             var dbContext = SetupDatabase(nameof(CreateLabel_ShouldCreateLabel));
             var repository = new TodoListRepository(dbContext);
-            var input = new CreateOrDeleteLabelDto
+            var input = new CreateLabelDto
             {
                 ParentId = 1,
                 Label = "Test label"
@@ -309,7 +309,7 @@ namespace Todo.UnitTests.Data
             // Arrange
             var dbContext = SetupDatabase(nameof(DeleteLabel_ShouldReturnFalseIfListIsNotFound));
             var repository = new TodoListRepository(dbContext);
-            var input = new CreateOrDeleteLabelDto
+            var input = new DeleteLabelDto
             {
                 ParentId = 30
             };
@@ -327,7 +327,7 @@ namespace Todo.UnitTests.Data
             // Arrange
             var dbContext = SetupDatabase(nameof(DeleteLabel_ShouldReturnFalseIfLabelIsNotFound));
             var repository = new TodoListRepository(dbContext);
-            var input = new CreateOrDeleteLabelDto
+            var input = new DeleteLabelDto
             {
                 ParentId = 1,
                 Label = "test1"
@@ -346,7 +346,7 @@ namespace Todo.UnitTests.Data
             // Arrange
             var dbContext = SetupDatabase(nameof(DeleteLabel_ShouldDeleteLabel));
             var repository = new TodoListRepository(dbContext);
-            var input = new CreateOrDeleteLabelDto
+            var input = new DeleteLabelDto
             {
                 ParentId = 1,
                 Label = "Important"

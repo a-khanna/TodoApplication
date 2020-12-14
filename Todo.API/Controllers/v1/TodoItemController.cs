@@ -44,7 +44,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<PagedResult<TodoItemDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet]
+        [HttpGet("Items")]
         public IActionResult Get([FromQuery] PagingParameters input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
@@ -76,7 +76,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("{id}")]
-        public IActionResult GetSingle(int id)
+        public IActionResult GetItemById(int id)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var result = todoItemLogic.GetItem(userId, id);
@@ -106,7 +106,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost()]
+        [HttpPost]
         public IActionResult Create(CreateTodoItemDto input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
@@ -118,7 +118,7 @@ namespace Todo.API.Controllers.v1
                     Message = "User or list not found in the database."
                 });
             else
-                return CreatedAtAction(nameof(GetSingle), new { result.Id }, new Response<TodoItemDto>
+                return CreatedAtAction(nameof(GetItemById), new { result.Id }, new Response<TodoItemDto>
                 {
                     Status = true,
                     Model = result
@@ -292,7 +292,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("Label")]
-        public IActionResult CreateLabel(CreateOrDeleteLabelDto input)
+        public IActionResult AssignLabel(CreateLabelDto input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var result = todoItemLogic.CreateLabel(userId, input);
@@ -303,7 +303,7 @@ namespace Todo.API.Controllers.v1
                     Message = "User or item not found in the database."
                 });
             else
-                return CreatedAtAction(nameof(GetSingle), new { result.Id }, new Response<LabelDto>
+                return CreatedAtAction(nameof(GetItemById), new { result.Id }, new Response<LabelDto>
                 {
                     Status = true,
                     Model = result
@@ -358,7 +358,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpDelete("Label")]
-        public IActionResult DeleteLabel(CreateOrDeleteLabelDto deleteDto)
+        public IActionResult DeleteLabel(DeleteLabelDto deleteDto)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 

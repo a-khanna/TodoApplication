@@ -285,20 +285,20 @@ namespace Todo.UnitTests.API
         public void CreateLabel_ShouldCallCreateLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
 
             // Act
             controller.CreateLabel(input);
 
             // Assert
-            todoListLogic.Verify(u => u.CreateLabel(1, It.Is<CreateOrDeleteLabelDto>(c => c == input)));
+            todoListLogic.Verify(u => u.CreateLabel(1, It.Is<CreateLabelDto>(c => c == input)));
         }
 
         [Fact]
         public void CreateLabel_ShouldReturnBadRequestWhenCreateLabelReturnsNull()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
 
             // Act
             var result = controller.CreateLabel(input);
@@ -313,9 +313,9 @@ namespace Todo.UnitTests.API
         public void CreateLabel_ShouldReturnCreatedLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
             var model = new LabelDto();
-            todoListLogic.Setup(u => u.CreateLabel(1, It.Is<CreateOrDeleteLabelDto>(c => c == input))).Returns(model);
+            todoListLogic.Setup(u => u.CreateLabel(1, It.Is<CreateLabelDto>(c => c == input))).Returns(model);
 
             // Act
             var result = controller.CreateLabel(input);
@@ -373,7 +373,7 @@ namespace Todo.UnitTests.API
         public void DeleteLabel_ShouldCallDeleteLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new DeleteLabelDto();
 
             // Act
             controller.DeleteLabel(input);
@@ -386,7 +386,7 @@ namespace Todo.UnitTests.API
         public void DeleteLabel_ShouldReturnBadRequestWhenDeleteLabelReturnsFalse()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new DeleteLabelDto();
 
             // Act
             var result = controller.DeleteLabel(input);
@@ -401,7 +401,7 @@ namespace Todo.UnitTests.API
         public void DeleteLabel_ShouldReturnTrueOnSuccessfulDeletion()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto
+            var input = new DeleteLabelDto
             {
                 ParentId = 3,
                 Label = "testlabel"

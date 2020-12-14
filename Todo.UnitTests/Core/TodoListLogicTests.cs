@@ -187,7 +187,7 @@ namespace Todo.UnitTests.Core
         public void CreateLabel_ShouldCallCreateLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
 
             // Act
             logic.CreateLabel(1, input);
@@ -200,7 +200,7 @@ namespace Todo.UnitTests.Core
         public void CreateLabel_ShouldMapResultToDto()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
 
             // Act
             logic.CreateLabel(1, input);
@@ -239,7 +239,7 @@ namespace Todo.UnitTests.Core
         public void DeleteLabel_ShouldCallDeleteLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new DeleteLabelDto();
 
             // Act
             logic.DeleteLabel(1, input);

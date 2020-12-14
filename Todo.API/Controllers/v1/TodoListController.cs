@@ -292,7 +292,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("Label")]
-        public IActionResult CreateLabel(CreateOrDeleteLabelDto input)
+        public IActionResult CreateLabel(CreateLabelDto input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var result = todoListLogic.CreateLabel(userId, input);
@@ -358,7 +358,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpDelete("Label")]
-        public IActionResult DeleteLabel(CreateOrDeleteLabelDto deleteDto)
+        public IActionResult DeleteLabel(DeleteLabelDto deleteDto)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 

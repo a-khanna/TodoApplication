@@ -2,7 +2,7 @@
 
 namespace Todo.Core.Models.Dtos
 {
-    public class CreateOrDeleteLabelDto
+    public class CreateLabelDto
     {
         /// <summary>
         /// This can be a todo list or a todo item

@@ -110,7 +110,7 @@ namespace Todo.Core.Logic
         /// <param name="userId">User id</param>
         /// <param name="createLabelDto">label for todo List to be created</param>
         /// <returns>Label dto</returns>
-        public LabelDto CreateLabel(int userId, CreateOrDeleteLabelDto createLabelDto)
+        public LabelDto CreateLabel(int userId, CreateLabelDto createLabelDto)
         {
             var dbLabel = todoItemRepository.CreateLabel(userId, createLabelDto);
             return mapper.Map<LabelDto>(dbLabel);
@@ -134,7 +134,7 @@ namespace Todo.Core.Logic
         /// <param name="userId">User id</param>
         /// <param name="deleteDto">Delete Dto</param>
         /// <returns>True if delete was successful</returns>
-        public bool DeleteLabel(int userId, CreateOrDeleteLabelDto deleteDto)
+        public bool DeleteLabel(int userId, DeleteLabelDto deleteDto)
         {
             return todoItemRepository.DeleteLabel(userId, deleteDto);
         }

@@ -173,7 +173,7 @@ namespace Todo.Data.Repositories
         /// <param name="userId">User id</param>
         /// <param name="createLabelDto">label for todo item to be created</param>
         /// <returns>Label dto</returns>
-        public Label CreateLabel(int userId, CreateOrDeleteLabelDto createLabelDto)
+        public Label CreateLabel(int userId, CreateLabelDto createLabelDto)
         {
             var user = dbContext.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
@@ -238,7 +238,7 @@ namespace Todo.Data.Repositories
         /// <param name="userId">User id</param>
         /// <param name="deleteDto">Delete Dto</param>
         /// <returns>True if delete was successful</returns>
-        public bool DeleteLabel(int userId, CreateOrDeleteLabelDto deleteDto)
+        public bool DeleteLabel(int userId, DeleteLabelDto deleteDto)
         {
             var existingItem = dbContext.TodoItems
                 .Include(l => l.Labels)

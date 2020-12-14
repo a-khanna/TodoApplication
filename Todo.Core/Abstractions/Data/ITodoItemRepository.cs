@@ -69,7 +69,7 @@ namespace Todo.Core.Abstractions.Data
         /// <param name="userId">User id</param>
         /// <param name="createLabelDto">label for todo item to be created</param>
         /// <returns>Label dto</returns>
-        Label CreateLabel(int userId, CreateOrDeleteLabelDto createLabelDto);
+        Label CreateLabel(int userId, CreateLabelDto createLabelDto);
 
         /// <summary>
         /// Updates label for a todo item.
@@ -85,6 +85,6 @@ namespace Todo.Core.Abstractions.Data
         /// <param name="userId">User id</param>
         /// <param name="deleteDto">Delete Dto</param>
         /// <returns>True if delete was successful</returns>
-        bool DeleteLabel(int userId, CreateOrDeleteLabelDto deleteDto);
+        bool DeleteLabel(int userId, DeleteLabelDto deleteDto);
     }
 }

@@ -57,13 +57,13 @@ namespace Todo.API.GraphQL
             return todoItemRepository.DeleteItem(userId, itemId);
         }
 
-        public Label AssignLabelToList(CreateOrDeleteLabelDto createLabelDto)
+        public Label AssignLabelToList(CreateLabelDto createLabelDto)
         {
             var userId = CheckAuthentication();
             return todoListRepository.CreateLabel(userId, createLabelDto);
         }
 
-        public Label AssignLabelToItem(CreateOrDeleteLabelDto createLabelDto)
+        public Label AssignLabelToItem(CreateLabelDto createLabelDto)
         {
             var userId = CheckAuthentication();
             return todoItemRepository.CreateLabel(userId, createLabelDto);
@@ -81,13 +81,13 @@ namespace Todo.API.GraphQL
             return todoItemRepository.UpdateLabel(userId, updateLabelDto);
         }
 
-        public bool DeleteListLabel(CreateOrDeleteLabelDto deleteDto)
+        public bool DeleteListLabel(DeleteLabelDto deleteDto)
         {
             var userId = CheckAuthentication();
             return todoListRepository.DeleteLabel(userId, deleteDto);
         }
 
-        public bool DeleteItemLabel(CreateOrDeleteLabelDto deleteDto)
+        public bool DeleteItemLabel(DeleteLabelDto deleteDto)
         {
             var userId = CheckAuthentication();
             return todoItemRepository.DeleteLabel(userId, deleteDto);

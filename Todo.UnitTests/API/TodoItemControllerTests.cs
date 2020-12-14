@@ -78,7 +78,7 @@ namespace Todo.UnitTests.API
         public void GetSingle_ShouldCallGetItem()
         {
             // Act
-            controller.GetSingle(3);
+            controller.GetItemById(3);
 
             // Assert
             todoItemLogic.Verify(u => u.GetItem(1, 3));
@@ -88,7 +88,7 @@ namespace Todo.UnitTests.API
         public void GetSingle_ShouldReturnBadRequestWhenGetItemReturnsNull()
         {
             // Act
-            var result = controller.GetSingle(3);
+            var result = controller.GetItemById(3);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -104,7 +104,7 @@ namespace Todo.UnitTests.API
             todoItemLogic.Setup(u => u.GetItem(1, 3)).Returns(model);
 
             // Act
-            var result = controller.GetSingle(3);
+            var result = controller.GetItemById(3);
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -285,23 +285,23 @@ namespace Todo.UnitTests.API
         public void CreateLabel_ShouldCallCreateLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
 
             // Act
-            controller.CreateLabel(input);
+            controller.AssignLabel(input);
 
             // Assert
-            todoItemLogic.Verify(u => u.CreateLabel(1, It.Is<CreateOrDeleteLabelDto>(c => c == input)));
+            todoItemLogic.Verify(u => u.CreateLabel(1, It.Is<CreateLabelDto>(c => c == input)));
         }
 
         [Fact]
         public void CreateLabel_ShouldReturnBadRequestWhenCreateLabelReturnsNull()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
 
             // Act
-            var result = controller.CreateLabel(input);
+            var result = controller.AssignLabel(input);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -313,12 +313,12 @@ namespace Todo.UnitTests.API
         public void CreateLabel_ShouldReturnCreatedLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new CreateLabelDto();
             var model = new LabelDto();
-            todoItemLogic.Setup(u => u.CreateLabel(1, It.Is<CreateOrDeleteLabelDto>(c => c == input))).Returns(model);
+            todoItemLogic.Setup(u => u.CreateLabel(1, It.Is<CreateLabelDto>(c => c == input))).Returns(model);
 
             // Act
-            var result = controller.CreateLabel(input);
+            var result = controller.AssignLabel(input);
 
             // Assert
             Assert.IsType<CreatedAtActionResult>(result);
@@ -373,7 +373,7 @@ namespace Todo.UnitTests.API
         public void DeleteLabel_ShouldCallDeleteLabel()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new DeleteLabelDto();
 
             // Act
             controller.DeleteLabel(input);
@@ -386,7 +386,7 @@ namespace Todo.UnitTests.API
         public void DeleteLabel_ShouldReturnBadRequestWhenDeleteLabelReturnsFalse()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto();
+            var input = new DeleteLabelDto();
 
             // Act
             var result = controller.DeleteLabel(input);
@@ -401,7 +401,7 @@ namespace Todo.UnitTests.API
         public void DeleteLabel_ShouldReturnTrueOnSuccessfulDeletion()
         {
             // Arrange
-            var input = new CreateOrDeleteLabelDto
+            var input = new DeleteLabelDto
             {
                 ParentId = 3,
                 Label = "testlabel"

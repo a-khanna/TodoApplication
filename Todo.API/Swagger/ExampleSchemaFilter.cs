@@ -74,10 +74,15 @@ namespace Todo.API.Swagger
                     [nameof(LabelDto.Id)] = new OpenApiInteger(1),
                     [nameof(LabelDto.Name)] = new OpenApiString("Urgent"),
                 },
-                nameof(CreateOrDeleteLabelDto) => new OpenApiObject
+                nameof(CreateLabelDto) => new OpenApiObject
                 {
-                    [nameof(CreateOrDeleteLabelDto.ParentId)] = new OpenApiInteger(1),
-                    [nameof(CreateOrDeleteLabelDto.Label)] = new OpenApiString("Urgent"),
+                    [nameof(CreateLabelDto.ParentId)] = new OpenApiInteger(1),
+                    [nameof(CreateLabelDto.Label)] = new OpenApiString("Urgent"),
+                },
+                nameof(DeleteLabelDto) => new OpenApiObject
+                {
+                    [nameof(DeleteLabelDto.ParentId)] = new OpenApiInteger(1),
+                    [nameof(DeleteLabelDto.Label)] = new OpenApiString("Urgent"),
                 },
                 nameof(UpdateLabelDto) => new OpenApiObject
                 {

@@ -14,41 +14,41 @@ using Todo.Core.Models.Response;
 namespace Todo.API.Controllers.v1
 {
     /// <summary>
-    /// Controller for Todo list related operations
+    /// Controller for Todo items related operations
     /// </summary>
     [Route("api/v{version:apiVersion}/todo/[controller]")]
     [ApiVersion("1.0")]
     [ApiController]
     [Authorize]
-    public class TodoListController : ControllerBase
+    public class TodoItemsController : ControllerBase
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly ITodoListLogic todoListLogic;
+        private readonly ITodoItemLogic todoItemLogic;
         private readonly IMapper mapper;
 
-        public TodoListController(IHttpContextAccessor httpContextAccessor, ITodoListLogic todoListLogic, IMapper mapper)
+        public TodoItemsController(IHttpContextAccessor httpContextAccessor, ITodoItemLogic todoItemLogic, IMapper mapper)
         {
             this.httpContextAccessor = httpContextAccessor;
-            this.todoListLogic = todoListLogic;
+            this.todoItemLogic = todoItemLogic;
             this.mapper = mapper;
         }
 
         /// <summary>
-        /// Gets the todo lists for a user
+        /// Gets all todo items for a user matching the filter criteria.
         /// </summary>
         /// <param name="input">Paging parameters for the request</param>
         /// <returns>Action result containing PagedResult or ErrorResponse</returns>
         /// <response code="200">Gets the response model and returns Ok response</response>
         /// <response code="400">User was not found in the database</response>
         /// <response code="401">The user is not logged in</response>
-        [ProducesResponseType(typeof(Response<PagedResult<TodoListDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<PagedResult<TodoItemDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("Lists")]
+        [HttpGet]
         public IActionResult Get([FromQuery] PagingParameters input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
-            var result = todoListLogic.GetLists(userId, input);
+            var result = todoItemLogic.GetItems(userId, input);
 
             if (result == null)
                 return BadRequest(new ErrorResponse
@@ -57,7 +57,7 @@ namespace Todo.API.Controllers.v1
                     Message = "User not found in the database."
                 });
             else
-                return Ok(new Response<PagedResult<TodoListDto>>
+                return Ok(new Response<PagedResult<TodoItemDto>>
                 {
                     Status = true,
                     Model = result
@@ -65,22 +65,52 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Get a complete todo list object by id. (Includes its items and labels)
+        /// Get a todo item by id
         /// </summary>
-        /// <param name="id">Id of the list</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
+        /// <param name="id">Id of the item</param>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
         /// <response code="200">Gets the response model and returns Ok response</response>
-        /// <response code="400">User or list was not found in the database</response>
+        /// <response code="400">User or item was not found in the database</response>
         /// <response code="401">The user is not logged in</response>
-        [ProducesResponseType(typeof(Response<TodoListDetailedDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("{id}")]
-        public IActionResult GetListById(int id)
+        public IActionResult GetItemById(int id)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
-            var result = todoListLogic.GetList(userId, id);
+            var result = todoItemLogic.GetItem(userId, id);
 
+            if (result == null)
+                return BadRequest(new ErrorResponse
+                {
+                    Status = false,
+                    Message = "User or item not found in the database."
+                });
+            else
+                return Ok(new Response<TodoItemDto>
+                {
+                    Status = true,
+                    Model = result
+                });
+        }
+
+        /// <summary>
+        /// Creates a TodoItem.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="201">Creates todo item record and returns the location where created.</response>
+        /// <response code="401">The user is not logged in</response>
+        /// <response code="400">User or list was not found in the database</response>
+        [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost]
+        public IActionResult Create(CreateTodoItemDto input)
+        {
+            var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
+            var result = todoItemLogic.CreateItem(userId, input);
             if (result == null)
                 return BadRequest(new ErrorResponse
                 {
@@ -88,7 +118,7 @@ namespace Todo.API.Controllers.v1
                     Message = "User or list not found in the database."
                 });
             else
-                return Ok(new Response<TodoListDetailedDto>
+                return CreatedAtAction(nameof(GetItemById), new { result.Id }, new Response<TodoItemDto>
                 {
                     Status = true,
                     Model = result
@@ -96,65 +126,35 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Creates a Todolist.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="201">Creates todolist record and returns the location where created.</response>
-        /// <response code="401">The user is not logged in</response>
-        /// <response code="400">User was not found in the database</response>
-        [ProducesResponseType(typeof(Response<TodoListDto>), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]        
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpPost()]
-        public IActionResult Create(CreateTodoListDto input)
-        {
-            var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
-            var result = todoListLogic.CreateList(userId, input);
-            if (result == null)
-                return BadRequest(new ErrorResponse
-                {
-                    Status = false,
-                    Message = "User not found in the database."
-                });
-            else
-                return CreatedAtAction(nameof(GetListById), new { result.Id }, new Response<TodoListDto>
-                {
-                    Status = true,
-                    Model = result
-                });
-        }
-
-        /// <summary>
-        /// Update todo list
+        /// Update todo item
         /// </summary>
         /// <param name="updateObj">Update object</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="200">Update todo list and returns Ok result</response>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="200">Update todo item and returns Ok result</response>
         /// <response code="401">User is not logged in.</response>
         /// <response code="400">Invalid data. No data exists for the given Id</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(Response<TodoListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPut]
-        public IActionResult Update(UpdateTodoListDto updateObj)
+        public IActionResult Update(UpdateTodoItemDto updateObj)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
-            var updateDto = mapper.Map<TodoListDto>(updateObj);
+            var updateDto = mapper.Map<TodoItemDto>(updateObj);
 
-            var updatedResult = todoListLogic.UpdateList(userId, updateDto);
+            var updatedResult = todoItemLogic.UpdateItem(userId, updateDto);
 
             if (updatedResult == null)
             {
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "List not found in the database."
+                    Message = "Item not found in the database."
                 });
             }
             else
             {
-                return Ok(new Response<TodoListDto>
+                return Ok(new Response<TodoItemDto>
                 {
                     Status = true,
                     Model = updatedResult
@@ -163,49 +163,49 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Update todo list using JsonPatchDocument
+        /// Update todo item using JsonPatchDocument
         /// </summary>
-        /// <param name="listId"></param>
+        /// <param name="itemId"></param>
         /// <param name="patchDocument">Patch data</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="200">Update todo list and returns Ok result</response>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="200">Update todo item and returns Ok result</response>
         /// <response code="401">User is not logged in.</response>
         /// <response code="400">Invalid data. No data exists for the given Id</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(Response<TodoListDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPatch]
-        public IActionResult Patch([Required] int listId, [FromBody] JsonPatchDocument<UpdateTodoListDto> patchDocument)
+        public IActionResult Patch([Required] int itemId, [FromBody] JsonPatchDocument<UpdateTodoItemDto> patchDocument)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 
-            var existingData = todoListLogic.GetList(userId, listId);
+            var existingData = todoItemLogic.GetItem(userId, itemId);
             if (existingData == null)
             {
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "List not found in the database."
+                    Message = "Item not found in the database."
                 });
             }
-            var patchDto = mapper.Map<JsonPatchDocument<TodoListDto>>(patchDocument);
-            var existingDto = mapper.Map<TodoListDto>(existingData);
+            var patchDto = mapper.Map<JsonPatchDocument<TodoItemDto>>(patchDocument);
+            var existingDto = mapper.Map<TodoItemDto>(existingData);
 
             patchDto.ApplyTo(existingDto);
 
-            var updatedResult = todoListLogic.UpdateList(userId, existingDto);
+            var updatedResult = todoItemLogic.UpdateItem(userId, existingDto);
 
             if (updatedResult == null)
             {
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "List not found in the database."
+                    Message = "Item not found in the database."
                 });
             }
             else
             {
-                return Ok(new Response<TodoListDto>
+                return Ok(new Response<TodoItemDto>
                 {
                     Status = true,
                     Model = updatedResult
@@ -214,11 +214,11 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Delete todo list
+        /// Delete todo item
         /// </summary>
         /// <param name="id">Id of the object to be deleted</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="200">Deletes todo list and returns Ok result</response>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="200">Deletes todo item and returns Ok result</response>
         /// <response code="401">User is not logged in.</response>
         /// <response code="400">Invalid data. No data exists for the given Id</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -229,48 +229,48 @@ namespace Todo.API.Controllers.v1
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 
-            var deleteResult = todoListLogic.DeleteList(userId, id);
+            var deleteResult = todoItemLogic.DeleteItem(userId, id);
 
             if (deleteResult)
             {
                 return Ok(new Response<string>
                 {
                     Status = true,
-                    Model = $"Todo List with id {id} deleted."
-                });               
+                    Model = $"Todo item with id {id} deleted."
+                });
             }
             else
             {
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "List not found in the database."
+                    Message = "Item not found in the database."
                 });
             }
         }
 
         /// <summary>
-        /// Gets the labels for todo lists for a user
+        /// Gets the labels for todo item
         /// </summary>
-        /// <param name="listId">Id of the list</param>
+        /// <param name="itemId">Id of the item</param>
         /// <returns>Action result containing PagedResult or ErrorResponse</returns>
         /// <response code="200">Gets the response model and returns Ok response</response>
-        /// <response code="400">User or list was not found in the database</response>
+        /// <response code="400">User or item was not found in the database</response>
         /// <response code="401">The user is not logged in</response>
         [ProducesResponseType(typeof(Response<List<LabelDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("Label")]
-        public IActionResult GetLabels([FromQuery] int listId)
+        public IActionResult GetLabels([FromQuery] int itemId)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
-            var result = todoListLogic.GetListLabels(userId, listId);
+            var result = todoItemLogic.GetItemLabels(userId, itemId);
 
             if (result == null)
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "User or list not found in the database."
+                    Message = "User or item not found in the database."
                 });
             else
                 return Ok(new Response<List<LabelDto>>
@@ -281,13 +281,13 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Assign a label to a Todolist.
+        /// Assign a label to a TodoItem.
         /// </summary>
         /// <param name="input">Create label dto</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="201">Creates todolist record and returns the location where created.</response>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="201">Creates label and returns the location where created.</response>
         /// <response code="401">The user is not logged in</response>
-        /// <response code="400">User or list was not found in the database</response>
+        /// <response code="400">User or item was not found in the database</response>
         [ProducesResponseType(typeof(Response<LabelDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -295,15 +295,15 @@ namespace Todo.API.Controllers.v1
         public IActionResult AssignLabel(CreateLabelDto input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
-            var result = todoListLogic.CreateLabel(userId, input);
+            var result = todoItemLogic.CreateLabel(userId, input);
             if (result == null)
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "User or list not found in the database."
+                    Message = "User or item not found in the database."
                 });
             else
-                return CreatedAtAction(nameof(GetListById), new { result.Id }, new Response<LabelDto>
+                return CreatedAtAction(nameof(GetItemById), new { result.Id }, new Response<LabelDto>
                 {
                     Status = true,
                     Model = result
@@ -311,13 +311,13 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Update label for a todo list
+        /// Update label for a todo item
         /// </summary>
         /// <param name="updateDto">Update object</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="200">Update label for todo list and returns Ok result</response>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="200">Update label for todo item and returns Ok result</response>
         /// <response code="401">User is not logged in.</response>
-        /// <response code="400">List or label does not exist</response>
+        /// <response code="400">Item or label does not exist</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(Response<LabelDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -326,14 +326,14 @@ namespace Todo.API.Controllers.v1
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 
-            var updatedResult = todoListLogic.UpdateLabel(userId, updateDto);
+            var updatedResult = todoItemLogic.UpdateLabel(userId, updateDto);
 
             if (updatedResult == null)
             {
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "List or label not found in the database."
+                    Message = "Item or label not found in the database."
                 });
             }
             else
@@ -347,13 +347,13 @@ namespace Todo.API.Controllers.v1
         }
 
         /// <summary>
-        /// Delete label for a todo list
+        /// Delete label for a todo item
         /// </summary>
-        /// <param name="deleteDto">deleteDto containing list id and label name</param>
-        /// <returns>Action result containing todo List or ErrorResponse</returns>
-        /// <response code="200">Delete label for todo list and returns Ok result</response>
+        /// <param name="deleteDto">deleteDto containing item id and label name</param>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="200">Delete label for todo item and returns Ok result</response>
         /// <response code="401">User is not logged in.</response>
-        /// <response code="400">List or label does not exist</response>
+        /// <response code="400">item or label does not exist</response>
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(Response<string>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -362,14 +362,14 @@ namespace Todo.API.Controllers.v1
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
 
-            var deleteResult = todoListLogic.DeleteLabel(userId, deleteDto);
+            var deleteResult = todoItemLogic.DeleteLabel(userId, deleteDto);
 
             if (deleteResult)
             {
                 return Ok(new Response<string>
                 {
                     Status = true,
-                    Model = $"Label {deleteDto.Label} deleted for list with id {deleteDto.ParentId}."
+                    Model = $"Label {deleteDto.Label} deleted for item with id {deleteDto.ParentId}."
                 });
             }
             else
@@ -377,7 +377,7 @@ namespace Todo.API.Controllers.v1
                 return BadRequest(new ErrorResponse
                 {
                     Status = false,
-                    Message = "List or label not found in the database."
+                    Message = "Item or label not found in the database."
                 });
             }
         }

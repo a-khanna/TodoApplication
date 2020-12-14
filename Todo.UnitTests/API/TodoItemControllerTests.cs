@@ -18,7 +18,7 @@ namespace Todo.UnitTests.API
         private readonly Mock<IHttpContextAccessor> httpContextAccessor;
         private readonly Mock<ITodoItemLogic> todoItemLogic;
         private readonly Mock<IMapper> mapper;
-        private readonly TodoItemController controller;
+        private readonly TodoItemsController controller;
 
         public TodoItemControllerTests()
         {
@@ -26,7 +26,7 @@ namespace Todo.UnitTests.API
             todoItemLogic = new Mock<ITodoItemLogic>();
             mapper = new Mock<IMapper>();
             SetupHttpContext();
-            controller = new TodoItemController(httpContextAccessor.Object, todoItemLogic.Object, mapper.Object);
+            controller = new TodoItemsController(httpContextAccessor.Object, todoItemLogic.Object, mapper.Object);
         }
 
         [Fact]

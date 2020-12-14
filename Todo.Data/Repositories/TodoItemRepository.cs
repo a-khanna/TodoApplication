@@ -38,8 +38,12 @@ namespace Todo.Data.Repositories
                 .Include(d => d.Labels).AsNoTracking()
                 .Where(t => t.User.Id == userId);
 
+            // search by item name or labels
             if (!string.IsNullOrWhiteSpace(pagingParams.Search))
-                dbItems = dbItems.Where(d => d.Description.ToLower().Contains(pagingParams.Search.ToLower()));
+            {
+                var searchLower = pagingParams.Search.ToLower();
+                dbItems = dbItems.Where(d => d.Description.ToLower().Contains(searchLower) || d.Labels.Any(l => l.Name.ToLower().Contains(searchLower)));
+            }
 
             var count = dbItems.Count();
 

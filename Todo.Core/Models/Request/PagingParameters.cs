@@ -7,7 +7,7 @@
     public class PagingParameters
     {
         /// <summary>
-        /// Search string for filtering
+        /// Search by name/description or label
         /// </summary>
         /// <example>shopping</example>
         public string Search { get; set; }

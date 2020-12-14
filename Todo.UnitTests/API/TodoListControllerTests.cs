@@ -78,7 +78,7 @@ namespace Todo.UnitTests.API
         public void GetSingle_ShouldCallGetList()
         {
             // Act
-            controller.GetSingle(3);
+            controller.GetListById(3);
 
             // Assert
             todoListLogic.Verify(u => u.GetList(1, 3));
@@ -88,7 +88,7 @@ namespace Todo.UnitTests.API
         public void GetSingle_ShouldReturnBadRequestWhenGetListReturnsNull()
         {
             // Act
-            var result = controller.GetSingle(3);
+            var result = controller.GetListById(3);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -104,7 +104,7 @@ namespace Todo.UnitTests.API
             todoListLogic.Setup(u => u.GetList(1, 3)).Returns(model);
 
             // Act
-            var result = controller.GetSingle(3);
+            var result = controller.GetListById(3);
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -288,7 +288,7 @@ namespace Todo.UnitTests.API
             var input = new CreateLabelDto();
 
             // Act
-            controller.CreateLabel(input);
+            controller.AssignLabel(input);
 
             // Assert
             todoListLogic.Verify(u => u.CreateLabel(1, It.Is<CreateLabelDto>(c => c == input)));
@@ -301,7 +301,7 @@ namespace Todo.UnitTests.API
             var input = new CreateLabelDto();
 
             // Act
-            var result = controller.CreateLabel(input);
+            var result = controller.AssignLabel(input);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -318,7 +318,7 @@ namespace Todo.UnitTests.API
             todoListLogic.Setup(u => u.CreateLabel(1, It.Is<CreateLabelDto>(c => c == input))).Returns(model);
 
             // Act
-            var result = controller.CreateLabel(input);
+            var result = controller.AssignLabel(input);
 
             // Assert
             Assert.IsType<CreatedAtActionResult>(result);

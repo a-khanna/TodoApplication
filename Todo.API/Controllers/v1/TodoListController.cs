@@ -44,7 +44,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<PagedResult<TodoListDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet]
+        [HttpGet("Lists")]
         public IActionResult Get([FromQuery] PagingParameters input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
@@ -76,7 +76,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("{id}")]
-        public IActionResult GetSingle(int id)
+        public IActionResult GetListById(int id)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var result = todoListLogic.GetList(userId, id);
@@ -118,7 +118,7 @@ namespace Todo.API.Controllers.v1
                     Message = "User not found in the database."
                 });
             else
-                return CreatedAtAction(nameof(GetSingle), new { result.Id }, new Response<TodoListDto>
+                return CreatedAtAction(nameof(GetListById), new { result.Id }, new Response<TodoListDto>
                 {
                     Status = true,
                     Model = result
@@ -292,7 +292,7 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpPost("Label")]
-        public IActionResult CreateLabel(CreateLabelDto input)
+        public IActionResult AssignLabel(CreateLabelDto input)
         {
             var userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var result = todoListLogic.CreateLabel(userId, input);
@@ -303,7 +303,7 @@ namespace Todo.API.Controllers.v1
                     Message = "User or list not found in the database."
                 });
             else
-                return CreatedAtAction(nameof(GetSingle), new { result.Id }, new Response<LabelDto>
+                return CreatedAtAction(nameof(GetListById), new { result.Id }, new Response<LabelDto>
                 {
                     Status = true,
                     Model = result

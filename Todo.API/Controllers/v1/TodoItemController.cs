@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Todo.Core;
 using Todo.Core.Abstractions.Logic;
@@ -135,13 +137,63 @@ namespace Todo.API.Controllers.v1
         [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
         [HttpPut]
-        [HttpPatch]
         public IActionResult Update(UpdateTodoItemDto updateObj)
         {
             int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
             var updateDto = mapper.Map<TodoItemDto>(updateObj);
 
             var updatedResult = todoItemLogic.UpdateItem(userId, updateDto);
+
+            if (updatedResult == null)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Status = false,
+                    Message = "Item not found in the database."
+                });
+            }
+            else
+            {
+                return Ok(new Response<TodoItemDto>
+                {
+                    Status = true,
+                    Model = updatedResult
+                });
+            }
+        }
+
+        /// <summary>
+        /// Update todo item using JsonPatchDocument
+        /// </summary>
+        /// <param name="itemId"></param>
+        /// <param name="patchDocument">Patch data</param>
+        /// <returns>Action result containing todo item or ErrorResponse</returns>
+        /// <response code="200">Update todo item and returns Ok result</response>
+        /// <response code="401">User is not logged in.</response>
+        /// <response code="400">Invalid data. No data exists for the given Id</response>
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(Response<TodoItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [HttpPatch]
+        public IActionResult Patch([Required] int itemId, [FromBody] JsonPatchDocument<UpdateTodoItemDto> patchDocument)
+        {
+            int userId = int.Parse(httpContextAccessor.HttpContext.User.FindFirst(Constants.UserIdClaim)?.Value);
+
+            var existingData = todoItemLogic.GetItem(userId, itemId);
+            if (existingData == null)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Status = false,
+                    Message = "Item not found in the database."
+                });
+            }
+            var patchDto = mapper.Map<JsonPatchDocument<TodoItemDto>>(patchDocument);
+            var existingDto = mapper.Map<TodoItemDto>(existingData);
+
+            patchDto.ApplyTo(existingDto);
+
+            var updatedResult = todoItemLogic.UpdateItem(userId, existingDto);
 
             if (updatedResult == null)
             {

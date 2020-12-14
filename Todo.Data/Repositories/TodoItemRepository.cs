@@ -39,23 +39,23 @@ namespace Todo.Data.Repositories
                 .Where(t => t.User.Id == userId);
 
             // search by item name or labels
-            if (!string.IsNullOrWhiteSpace(pagingParams.Search))
+            if (!string.IsNullOrWhiteSpace(pagingParams?.Search))
             {
-                var searchLower = pagingParams.Search.ToLower();
+                var searchLower = pagingParams?.Search.ToLower();
                 dbItems = dbItems.Where(d => d.Description.ToLower().Contains(searchLower) || d.Labels.Any(l => l.Name.ToLower().Contains(searchLower)));
             }
 
             var count = dbItems.Count();
 
             var result = dbItems
-                .Skip(pagingParams.Skip)
-                .Take(pagingParams.Take)
+                .Skip(pagingParams?.Skip ?? 0)
+                .Take(pagingParams?.Take ?? 50)
                 .ToList();
 
             return new PagedResult<TodoItem>
             {
                 PageContent = result,
-                StartIndex = pagingParams.Skip,
+                StartIndex = pagingParams?.Skip ?? 0,
                 Total = count
             };
         }

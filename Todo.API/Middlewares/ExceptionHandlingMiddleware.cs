@@ -58,7 +58,10 @@ namespace Todo.API.Middlewares
                     context.Response.ContentType = "application/json";
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                     await context.Response.WriteAsync(JsonConvert.SerializeObject(errorModel));
-                }                
+                }  
+                
+                if (context.Response.StatusCode == StatusCodes.Status400BadRequest)
+                    logger.LogError("Bad request occurred! Check response log for more details.");
 
                 await substituteStream.CopyToAsync(originalResponseStream);
                 context.Response.Body = originalResponseStream;
